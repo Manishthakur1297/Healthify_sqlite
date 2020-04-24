@@ -2,10 +2,10 @@ Django Healthify Project
 
 API Created =========
 
-<h2>LOGIN API : http://127.0.0.1:8000/api/login/</h2>
+LOGIN API : http://127.0.0.1:8000/api/login/
 <br>
-<h2>USER API : http://127.0.0.1:8000/api/profile/</h2>
+USER API : http://127.0.0.1:8000/api/profile/
 <br>
-MEALS API : http://127.0.0.1:8000/api/meals/</h2>
+MEALS API : http://127.0.0.1:8000/api/meals/
 <br>
-ADMIN API : http://127.0.0.1:8000/admin</h2>
+ADMIN API : http://127.0.0.1:8000/admin
