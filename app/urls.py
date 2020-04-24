@@ -23,6 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app.meal.urls')),
     path('api/', include('app.profiles_api.urls')),
-    path('auth/', obtain_auth_token),
 ]
 

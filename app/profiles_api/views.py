@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import filters
 from rest_framework.response import Response
@@ -116,10 +117,33 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.UpdateOwnProfile,)
+    permission_classes = (permissions.UpdateOwnProfile, IsAuthenticated, )
 
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'email',)
+
+    def list(self, request):
+        if request.user.is_superuser:
+            user = UserProfile.objects.all()
+            serializer_class = UserProfileSerializer(user, many=True)
+            return Response(serializer_class.data, status=status.HTTP_200_OK)
+        else:
+            user = UserProfile.objects.get(id=request.user.id)
+            serializer_class = UserProfileSerializer(user, many=False)
+            return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            user = UserProfile.objects.get(id=kwargs['pk'])
+            if user.id==request.user.id or request.user.is_superuser:
+                serializer_class = UserProfileSerializer(user, many=False)
+                return Response(serializer_class.data, status=status.HTTP_200_OK)
+            else:
+                response = {'message': 'Not Authorised to view or edit user'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            response = {'message': 'User Not Found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
 
 
 class UserLoginApiView(ObtainAuthToken):
