@@ -22,7 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'wogqpeuovo%0p_u4ngqw0b@dgq_-hsbugv7su#ubd1@fvfp^qf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
+
+DEBUG = bool(int(os.environ.get('DEBUG', 1)))
 
 ALLOWED_HOSTS = []
 
@@ -162,3 +164,6 @@ AUTH_USER_MODEL = 'profiles_api.UserProfile'
 #     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 #     'PAGE_SIZE': 20,
 # }
+
+
+STATIC_ROOT = 'static/'
