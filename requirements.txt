@@ -1,0 +1,9 @@
+Django
+djangorestframework
+django-allauth
+django-rest-auth
+django-cors-headers
+django-rest-framework-mongoengine
+pymongo
+mongoengine
+django_mongoengine
