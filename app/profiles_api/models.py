@@ -2,6 +2,16 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from rest_framework import status
+from rest_framework.response import Response
+
+from ..meal.models import Meal as m
+
+from .serializer_user import MealSerializer1
+
+from json import JSONEncoder
+
+import json
 
 class UserProfileManager(BaseUserManager):
     """Manager for user profiles"""
@@ -34,6 +44,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     """Database model for users in the system"""
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
+    curr_calorie = models.FloatField(default=0)
+    max_calorie = models.FloatField(default=2000)
+
+    is_limit = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -53,3 +67,11 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """Return string representation of user"""
         return self.email
+
+    def meals(self):
+        print(self.id)
+        print(self.email)
+        meal = m.objects.filter(user_profile=self.id)
+        print(meal)
+        serializer_class = MealSerializer1(meal, many=True)
+        return serializer_class.data

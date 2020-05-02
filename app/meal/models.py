@@ -7,7 +7,7 @@ class Meal(models.Model):
     calorie = models.DecimalField(decimal_places=2,max_digits=20,default=0)
     description = models.TextField(max_length=256)
     created_at = models.DateTimeField(auto_now_add=True)
-    limit = models.BooleanField(default=False)
+    #limit = models.BooleanField(default=False)
     user_profile = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):

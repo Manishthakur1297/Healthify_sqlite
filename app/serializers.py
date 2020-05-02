@@ -12,7 +12,7 @@ class HelloSerializer(serializers.Serializer):
 class MealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meal
-        fields = ('id', 'food_name', 'calorie', 'description', 'created_at', 'limit', 'user_profile')
+        fields = ('id', 'food_name', 'calorie', 'description', 'created_at', 'user_profile')
         extra_kwargs = {'user_profile': {'read_only':True}}
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -20,24 +20,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('id', 'email', 'name', 'password')
+        fields = ('id', 'email', 'name', 'password', 'curr_calorie', 'max_calorie', 'is_limit' , 'meals')
         extra_kwargs = {
             'password': {
                 'write_only': True,
                 'style': {'input_type': 'password'}
+            },
+            'curr_calorie' : {
+                'read_only': True
+            },
+            'max_calorie': {
+                'read_only': True
+            },
+            'is_limit' : {
+                'read_only': True
             }
+
         }
 
     def create(self, validated_data):
-        """Create and return a new user"""
-        user = UserProfile.objects.create_user(
-            email=validated_data['email'],
-            name=validated_data['name'],
-            password=validated_data['password']
-        )
-
+        user = UserProfile.objects.create_user(**validated_data)
+        Token.objects.create(user=user)
         return user
-
+    #
     def update(self, instance, validated_data):
         """Handle updating user account"""
         if 'password' in validated_data:
@@ -45,14 +50,3 @@ class UserProfileSerializer(serializers.ModelSerializer):
             instance.set_password(password)
 
         return super().update(instance, validated_data)
-
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('id', 'username', 'password', 'meal')
-#         extra_kwargs = {'password': {'write_only': True, 'required': True}}
-#
-#     def create(self, validated_data):
-#         user = User.objects.create_user(**validated_data)
-#         Token.objects.create(user=user)
-#         return user

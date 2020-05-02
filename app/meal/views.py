@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -9,6 +10,7 @@ from .utils import nutritionnix_calorie_api
 from django.http.request import QueryDict, MultiValueDict
 from ..profiles_api import permissions
 
+from ..profiles_api.models import UserProfile
 
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
@@ -61,6 +63,16 @@ class MealViewSet(viewsets.ModelViewSet):
             query_dict.update(MultiValueDict(data))
             serializer = MealSerializer(data = query_dict)
             if serializer.is_valid():
+                try:
+                    user = UserProfile.objects.get(pk=self.request.user.id)
+                    user.curr_calorie+=float(data['calorie'][0])
+                    if user.curr_calorie < user.max_calorie:
+                        user.is_limit = False
+                    else:
+                        user.is_limit = True
+                    user.save()
+                except:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
                 serializer.save(user_profile=self.request.user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -72,7 +84,9 @@ class MealViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if request.method == 'PUT':
+            calorie = 0
             if snippet.food_name==request.data['food_name'] and float(request.data['calorie'])!=float(0):
+                calorie = request.data['calorie']
                 serializer = MealSerializer(snippet, data=request.data)
             else:
                 data = dict(request.data)
@@ -83,15 +97,47 @@ class MealViewSet(viewsets.ModelViewSet):
                         data['calorie'][0] = val
                     else:
                         return Response(status=status.HTTP_400_BAD_REQUEST)
-
+                calorie = data['calorie'][0]
                 query_dict = QueryDict('', mutable=True)
                 query_dict.update(MultiValueDict(data))
                 serializer = MealSerializer(snippet, data=query_dict)
 
+
             if serializer.is_valid():
+                try:
+                    user = UserProfile.objects.get(pk=self.request.user.id)
+                    user.curr_calorie -= float(snippet.calorie)
+                    user.curr_calorie += float(calorie)
+                    if user.curr_calorie < user.max_calorie:
+                        user.is_limit = False
+                    else:
+                        user.is_limit = True
+                    user.save()
+                except:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        calorie = instance.calorie
+        try:
+            user = UserProfile.objects.get(pk=self.request.user.id)
+            user.curr_calorie -= float(calorie)
+            if user.curr_calorie < user.max_calorie:
+                user.is_limit = False
+            else:
+                user.is_limit = True
+            user.save()
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
 
     # def partial_update(self, request, *args, **kwargs):
     #     print(args)
