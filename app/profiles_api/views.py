@@ -76,21 +76,21 @@ class UserRegisterView(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
 
     def retrieve(self, request, *args, **kwargs):
-        response = {'message': 'User Not Found'}
+        response = {'message': 'Page Not FOund'}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request, *args, **kwargs):
-        response = {'message': 'User Not Found'}
+        response = {'message': 'Page Not Found'}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, *args, **kwargs):
-        response = {'message': 'User Not Found'}
+        response = {'message': 'Page Not Found'}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def partial_update(self, request, *args, **kwargs):
-        response = {'message': 'User Not Found'}
+        response = {'message': 'Page Not Found'}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, *args, **kwargs):
-        response = {'message': 'User Not Found'}
+        response = {'message': 'Page Not Found'}
         return Response(response, status=status.HTTP_404_NOT_FOUND)

@@ -105,7 +105,11 @@ class MealViewSet(viewsets.ModelViewSet):
 
             if serializer.is_valid():
                 try:
-                    user = UserProfile.objects.get(pk=self.request.user.id)
+                    if request.user.is_superuser:
+                        user = UserProfile.objects.get(pk=snippet.user_profile.id)
+                    else:
+                        user = UserProfile.objects.get(pk=self.request.user.id)
+
                     user.curr_calorie -= float(snippet.calorie)
                     user.curr_calorie += float(calorie)
                     if user.curr_calorie < user.max_calorie:
@@ -123,7 +127,10 @@ class MealViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         calorie = instance.calorie
         try:
-            user = UserProfile.objects.get(pk=self.request.user.id)
+            if request.user.is_superuser:
+                user = UserProfile.objects.get(pk=instance.user_profile.id)
+            else:
+                user = UserProfile.objects.get(pk=self.request.user.id)
             user.curr_calorie -= float(calorie)
             if user.curr_calorie < user.max_calorie:
                 user.is_limit = False
