@@ -7,3 +7,4 @@ django-rest-framework-mongoengine
 pymongo
 mongoengine
 django_mongoengine
+djangorestframework-simplejwt

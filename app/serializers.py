@@ -29,20 +29,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'curr_calorie' : {
                 'read_only': True
             },
-            'max_calorie': {
-                'read_only': True
-            },
+            # 'max_calorie': {
+            #     'write_only': True
+            # },
             'is_limit' : {
                 'read_only': True
             }
 
         }
 
+    # def create(self, validated_data):
+    #     user = UserProfile.objects.create_user(**validated_data)
+    #     Token.objects.create(user=user)
+    #     return user
+
     def create(self, validated_data):
-        user = UserProfile.objects.create_user(**validated_data)
-        Token.objects.create(user=user)
-        return user
-    #
+        password = validated_data.pop('password', None)
+        instance = self.Meta.model(**validated_data)  # as long as the fields are the same, we can just use this
+        if password is not None:
+            instance.set_password(password)
+        instance.save()
+        return instance
+
     def update(self, instance, validated_data):
         """Handle updating user account"""
         if 'password' in validated_data:

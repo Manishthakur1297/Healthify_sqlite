@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    #'rest_framework.authtoken',
     # 'rest_auth',
     # 'django.contrib.sites',
     # 'allauth',
@@ -109,9 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -122,48 +119,43 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-    'http://0.0.0.0:4000',
-    'http://localhost:4000',
+    'http://localhost:3000',
 )
 
 AUTH_USER_MODEL = 'profiles_api.UserProfile'
-#
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-# ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_UNIQUE_EMAIL = True
-# ACCOUNT_USERNAME_REQUIRED = False
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-# ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/?verification=1'
-# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/?verification=1'
-#
-# SITE_ID = 1
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Tell Django about the custom `User` model we created. The string
-# `authentication.User` tells Django we are referring to the `User` model in
-# the `authentication` module. This module is registered above in a setting
-# called `INSTALLED_APPS`.
-# AUTH_USER_MODEL = 'authentication.User'
-
-# REST_FRAMEWORK = {
-#     'EXCEPTION_HANDLER': 'conduit.apps.core.exceptions.core_exception_handler',
-#     'NON_FIELD_ERRORS_KEY': 'error',
-#
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'conduit.apps.authentication.backends.JWTAuthentication',
-#     ),
 #     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 #     'PAGE_SIZE': 20,
-# }
+
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'USER_ID_FIELD': 'email',
+    'USER_ID_CLAIM': 'email',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken','rest_framework_simplejwt.tokens.RefreshToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+}
 
 
 STATIC_ROOT = 'static/'

@@ -15,7 +15,7 @@ from ..profiles_api.models import UserProfile
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
-    authentication_classes = (TokenAuthentication, )
+    #authentication_classes = (TokenAuthentication, )
     permission_classes = (permissions.UpdateOwnStatus, IsAuthenticated,)
     #http_method_names = ['get' , 'post', 'delete']
 

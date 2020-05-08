@@ -16,22 +16,22 @@ import json
 class UserProfileManager(BaseUserManager):
     """Manager for user profiles"""
 
-    def create_user(self, email, name, password=None):
+    def create_user(self, email, name, password=None, max_calorie=2000):
         """Create a new user profile"""
         if not email:
             raise ValueError('Users must have an email address')
 
         email = self.normalize_email(email)
-        user = self.model(email=email, name=name,)
+        user = self.model(email=email, name=name, max_calorie=max_calorie,)
 
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, email, name, password):
+    def create_superuser(self, email, name, password, max_calorie):
         """Create and save a new superuser with given details"""
-        user = self.create_user(email, name, password)
+        user = self.create_user(email, name, password, max_calorie)
 
         user.is_superuser = True
         user.is_staff = True
