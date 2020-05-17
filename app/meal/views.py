@@ -11,6 +11,7 @@ from django.http.request import QueryDict, MultiValueDict
 from ..profiles_api import permissions
 
 from ..profiles_api.models import UserProfile
+import datetime
 
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
@@ -25,12 +26,13 @@ class MealViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         if request.user.is_superuser:
-            meal = Meal.objects.all()
+
+            meal = Meal.objects.filter(created_at=datetime.datetime.now().strftime('%d%m%y'))
             serializer_class = MealSerializer(meal, many=True)
         else:
             print(request.data)
             print(request.user.id)
-            meal = Meal.objects.filter(user_profile=request.user.id)
+            meal = Meal.objects.filter(user_profile=request.user.id, created_at=datetime.datetime.now().strftime('%d%m%y'))
             print(meal)
             serializer_class = MealSerializer(meal, many=True)
         return Response(serializer_class.data, status=status.HTTP_200_OK)
@@ -52,6 +54,7 @@ class MealViewSet(viewsets.ModelViewSet):
     def create(self, request):
         if request.method=='POST':
             data = dict(request.data)
+            print(request.data)
             if len(data['calorie'][0])==0 or float(data['calorie'][0])==float(0):
                 flag,val = nutritionnix_calorie_api(data['food_name'][0])
                 if flag:

@@ -12,6 +12,7 @@ from .serializer_user import MealSerializer1
 from json import JSONEncoder
 
 import json
+import datetime
 
 class UserProfileManager(BaseUserManager):
     """Manager for user profiles"""
@@ -71,7 +72,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def meals(self):
         print(self.id)
         print(self.email)
-        meal = m.objects.filter(user_profile=self.id)
+        meal = m.objects.filter(user_profile=self.id,created_at=datetime.datetime.now().strftime('%d%m%y'))
         print(meal)
         serializer_class = MealSerializer1(meal, many=True)
         return serializer_class.data
