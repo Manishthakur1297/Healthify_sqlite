@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .models import Meal
@@ -26,14 +27,17 @@ class MealViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         if request.user.is_superuser:
-
-            meal = Meal.objects.filter(created_at=datetime.datetime.now().strftime('%d%m%y'))
+            #print("MEALSSS ==== ", datetime.datetime.now().strftime('%d%m%y'))
+            data = request.GET["date"]
+            #print(data)
+            meal = Meal.objects.filter(created_at=data)
             serializer_class = MealSerializer(meal, many=True)
         else:
-            print(request.data)
-            print(request.user.id)
-            meal = Meal.objects.filter(user_profile=request.user.id, created_at=datetime.datetime.now().strftime('%d%m%y'))
-            print(meal)
+            #print(request.data)
+            #print(request.user.id)
+            data = request.GET["date"]
+            meal = Meal.objects.filter(user_profile=request.user.id, created_at=data)
+            #print(meal)
             serializer_class = MealSerializer(meal, many=True)
         return Response(serializer_class.data, status=status.HTTP_200_OK)
 
@@ -54,7 +58,7 @@ class MealViewSet(viewsets.ModelViewSet):
     def create(self, request):
         if request.method=='POST':
             data = dict(request.data)
-            print(request.data)
+            #print(request.data)
             if len(data['calorie'][0])==0 or float(data['calorie'][0])==float(0):
                 flag,val = nutritionnix_calorie_api(data['food_name'][0])
                 if flag:
@@ -93,8 +97,8 @@ class MealViewSet(viewsets.ModelViewSet):
                 serializer = MealSerializer(snippet, data=request.data)
             else:
                 data = dict(request.data)
-                if not data['calorie'] or float(data['calorie'][0]) == float(0) \
-                        or float(snippet.calorie)==float(data['calorie'][0]):
+                # \ or float(snippet.calorie) == float(data['calorie'][0])
+                if not data['calorie'] or float(data['calorie'][0]) == float(0):
                     flag, val = nutritionnix_calorie_api(data['food_name'][0])
                     if flag:
                         data['calorie'][0] = val

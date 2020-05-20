@@ -6,7 +6,7 @@ import datetime
 class Meal(models.Model):
     food_name = models.CharField(max_length=32)
     calorie = models.FloatField(default=0)
-    description = models.TextField(max_length=256)
+    description = models.TextField(default="", max_length=256)
     #created_at = models.DateTimeField(auto_now_add=True)
     #x = datetime.datetime.now()
     created_at = models.TextField(default=datetime.datetime.now().strftime('%d%m%y'))

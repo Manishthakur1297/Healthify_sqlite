@@ -70,9 +70,9 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def meals(self):
-        print(self.id)
-        print(self.email)
+        #print(self.id)
+        #print(self.email)
         meal = m.objects.filter(user_profile=self.id,created_at=datetime.datetime.now().strftime('%d%m%y'))
-        print(meal)
+        #print(meal)
         serializer_class = MealSerializer1(meal, many=True)
         return serializer_class.data
