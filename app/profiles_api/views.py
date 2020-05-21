@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.shortcuts import render
+from django.utils.datastructures import MultiValueDict
 from django.views.generic import TemplateView
 from rest_framework import status, mixins
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -60,6 +61,33 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         except:
             response = {'message': 'User Not Found'}
             return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    def update(self, request, pk=None):
+        try:
+            snippet = UserProfile.objects.get(pk=pk)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        print(request.data)
+        query_dict = QueryDict('', mutable=True)
+        query_dict.update(MultiValueDict(request.data))
+        print(query_dict)
+        if request.method == 'PUT':
+            print(snippet)
+            serializer = UserProfileSerializer(snippet, data=query_dict)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        print(args)
+        print(kwargs)
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
 
 # class UserLoginApiView(ObtainAuthToken):
